@@ -109,10 +109,14 @@ fn main() {
     let mut filtered_sql_paths: Vec<PathBuf> = vec![];
     for path in sql_paths.clone() {
         let file_name = String::from(path.clone().file_name().unwrap().to_str().unwrap());
-        let file_migration_type: Vec<String> = file_name.clone().split(".")
+        let file_migration_type: Vec<String> = file_name
+            .clone()
+            .split(".")
             .map(|s| s.to_string())
             .collect();
-        if !migration_files.contains(&file_name) && migration_type == file_migration_type[file_migration_type.len() - 2] {
+        if !migration_files.contains(&file_name)
+            && migration_type == file_migration_type[file_migration_type.len() - 2]
+        {
             filtered_sql_paths.push(path);
         }
     }
@@ -121,21 +125,10 @@ fn main() {
         process::exit(0);
     }
     for path in filtered_sql_paths {
-        let path_split: Vec<String> = path
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .split(".")
-            .map(|s| s.to_string())
-            .collect();
-
-        if migration_type == path_split[path_split.len() - 2] {
-            let err_message = format!("error while running file {:?}", path);
-            let insert_err_message = format!("error while inserting file {:?}", path);
-            let file_name = String::from(path.clone().file_name().unwrap().to_str().unwrap());
-            pg_client.run_query(read_file(path.clone()).as_str(), err_message.as_str());
-            pg_client.insert_file(file_name.as_str(), insert_err_message.as_str());
-        }
+        let err_message = format!("error while running file {:?}", path);
+        let insert_err_message = format!("error while inserting file {:?}", path);
+        let file_name = String::from(path.clone().file_name().unwrap().to_str().unwrap());
+        pg_client.run_query(read_file(path.clone()).as_str(), err_message.as_str());
+        pg_client.insert_file(file_name.as_str(), insert_err_message.as_str());
     }
 }
