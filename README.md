@@ -1,6 +1,8 @@
 # db-migration
 Postgres DB migration tool, written in rust 🦀
 
+## Download source from [here](https://github.com/saiumesh535/db-migration/releases/tag/0.01)
+
 ## This tool follows specific file structure for sql files as follows
 
 ```
