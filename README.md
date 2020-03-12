@@ -27,7 +27,7 @@ you can refer [this](https://github.com/saiumesh535/db-migration/tree/master/src
 
 ### commands
 
-1. First you need to have **migrations** table in database, query can be found [here](https://github.com/saiumesh535/db-migration/blob/master/src/pg_script.sql)
+First you need to have **migrations** table in database, query can be found [here](https://github.com/saiumesh535/db-migration/blob/master/src/pg_script.sql)
 
 Commands to run
 
@@ -47,6 +47,8 @@ you can override by writing following command
 ```cmd
 migration_type=down DB_URL=postgresql://postgres:postgres@localhost/migration-test ./target/release/db_migraiton.exe
 ```
+
+## migration_path
 
 optionally it uses **migration_path** as follows
 ```cmd
