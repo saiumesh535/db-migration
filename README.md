@@ -27,7 +27,7 @@ you can refer [this](https://github.com/saiumesh535/db-migration/tree/master/src
 
 ### commands
 
-1. First you need to migrations folder in database, query can be found [here](https://github.com/saiumesh535/db-migration/blob/master/src/pg_script.sql)
+1. First you need to have **migrations** table in database, query can be found [here](https://github.com/saiumesh535/db-migration/blob/master/src/pg_script.sql)
 
 Commands to run
 
