@@ -10,7 +10,7 @@ project
 │   │   1_some.up.sql
 |   |   1_some.down.sql
 │   │   2_second.up.sql
-|   |   1_second.down.sql
+|   |   2_second.down.sql
 │   │
 └───folder2
     │   file021.txt
