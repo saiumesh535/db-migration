@@ -32,7 +32,7 @@ pub fn get_yet_to_run_migration_files(sql_paths: Vec<PathBuf>, migration_type: S
     for path in sql_paths {
         let file_name = String::from(path.clone().file_name().unwrap().to_str().unwrap());
         let file_migration_type: Vec<String> = split_string(file_name.clone(), ".");
-        if !migrated_files.contains(&file_name) && path.clone().extension().unwrap() == "sql" && migration_type == file_migration_type[file_migration_type.len() - 2] {
+        if !migrated_files.contains(&file_name) && migration_type == file_migration_type[file_migration_type.len() - 2] {
             filtered_sql_paths.push(path);
         }
     }
