@@ -3,7 +3,7 @@ use std::env::var;
 use crate::errors::{ Result };
 use crate::errors::*;
 use postgres::{Client, NoTls};
-use crate::postgres_db::PGClient;
+use crate::postgres_db::{QueryTransaction, PGClient};
 use crate::fs_helpers::{get_all_sql_paths, get_yet_to_run_migration_files, get_queries_from_file};
 
 const UP_TYPE: &str = "up";
@@ -61,13 +61,24 @@ pub fn run_migration() -> Result<()> {
     }
 
     // iterate through sql files and run query
+    let mut query_transactions: Vec<QueryTransaction> = vec![];
+    let mut file_names: Vec<String> = vec![];
     for migration_file in migration_files {
         let queries = get_queries_from_file(migration_file.clone())?;
         let file_name = String::from(migration_file.clone().file_name().unwrap().to_str().unwrap());
         for query in queries {
             let err_message = format!("error while running file {:?}", &file_name);
-            pg_client.run_query(query.as_str(), err_message)?;
+            query_transactions.push(
+                QueryTransaction {
+                    query,
+                    message: err_message
+                }
+            )
         }
+        file_names.push(file_name);
+    }
+    pg_client.transaction(query_transactions)?;
+    for file_name in file_names {
         pg_client.insert_migration_file(file_name.as_str())?;
     }
 
