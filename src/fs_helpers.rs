@@ -39,9 +39,7 @@ pub fn get_yet_to_run_migration_files(sql_paths: Vec<PathBuf>, migration_type: S
     filtered_sql_paths
 }
 
-pub fn get_queries_from_file(path: PathBuf) -> Result<Vec<String>> {
-    let mut queries: Vec<String> = vec![];
-    let query = read_to_string(path.clone()).context(ReadConfiguration { path: path.clone() })?;
-    queries.extend(split_string(query, ";"));
-    Ok(queries)
+
+pub fn get_query_from_file(path: PathBuf) -> Result<String> {
+    Ok(read_to_string(path.clone()).context(ReadConfiguration { path: path.clone() })?)
 }
