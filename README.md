@@ -64,6 +64,8 @@ you can also override **migration_path** folder path as follows
 ```cmd
 migration_type=down migration_path=src/scripts/migration_path ./target/release/db_migraiton.exe
 ```
+## schema
+
 you can provide **schema** for migration table, buy default it uses **public** schema.
 ```cmd
 migration_type=up schema=public cargo run
