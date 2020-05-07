@@ -1,8 +1,8 @@
-use snafu::{Snafu};
+use postgres::Error as PGError;
+use snafu::Snafu;
 use std::env::VarError;
-use postgres::{Error as PGError};
-use std::io::{ Error as IOError };
-use std::{path::PathBuf};
+use std::io::Error as IOError;
+use std::path::PathBuf;
 
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub(crate)))]
@@ -21,6 +21,8 @@ pub enum Error {
     MigrationFileConfig { source: PGError, message: String },
     #[snafu(display("{}", message))]
     CustomMessageError { message: String },
+    NoneError
+
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;

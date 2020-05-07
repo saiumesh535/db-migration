@@ -3,7 +3,7 @@ use crate::errors::*;
 use crate::fs_helpers::{get_all_sql_paths, get_query_from_file, get_yet_to_run_migration_files};
 use crate::postgres_db::{PGClient, QueryTransaction};
 use postgres::{Client, NoTls};
-use snafu::ResultExt;
+use snafu::{ ResultExt, OptionExt };
 use std::env::var;
 
 const UP_TYPE: &str = "up";
@@ -57,18 +57,18 @@ pub fn run_migration() -> Result<()> {
     // make sure migrations table exists
     let _ = pg_client.check_migration_table(&schema)?;
 
-    // migrated files
-    let mut migrated_files: Vec<String> = vec![];
-    for migration_row in pg_client.get_migrations(&schema)? {
-        migrated_files.push(migration_row.get::<&str, String>("file_name"))
-    }
+    let migrated_files = pg_client
+        .get_migrations(&schema)?
+        .into_iter()
+        .map(|row| row.get::<&str, String>("file_name"))
+        .collect();
 
     // get sql paths
     let sql_paths = get_all_sql_paths()?;
 
     // run these migration files
     let migration_files =
-        get_yet_to_run_migration_files(sql_paths.clone(), migration_type.clone(), &migrated_files);
+        get_yet_to_run_migration_files(&sql_paths, &migration_type, &migrated_files)?;
 
     if migration_files.len() == 0 {
         return CustomMessageError {
@@ -79,17 +79,10 @@ pub fn run_migration() -> Result<()> {
 
     // iterate through sql files and run query
     let mut query_transactions: Vec<QueryTransaction> = vec![];
-    let mut file_names: Vec<String> = vec![];
+    let mut file_names: Vec<&str> = vec![];
     for migration_file in migration_files {
-        let query = get_query_from_file(migration_file.clone())?;
-        let file_name = String::from(
-            migration_file
-                .clone()
-                .file_name()
-                .unwrap()
-                .to_str()
-                .unwrap(),
-        );
+        let query = get_query_from_file(&migration_file)?;
+        let file_name = migration_file.file_name().context(NoneError)?.to_str().context(NoneError)?;
         let err_message = format!("error while running file {:?}", &file_name);
         query_transactions.push(QueryTransaction {
             query,
@@ -99,7 +92,7 @@ pub fn run_migration() -> Result<()> {
     }
     pg_client.transaction(query_transactions)?;
     for file_name in file_names {
-        pg_client.insert_migration_file(file_name.as_str(), &schema)?;
+        pg_client.insert_migration_file(file_name, &schema)?;
     }
 
     Ok(())
